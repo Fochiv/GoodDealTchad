@@ -1,3 +1,3 @@
 - [Orval zod.int() bug](orval-zod-int-bug.md) — orval v8 génère zod.int() (invalide en zod v3) pour les types number nullables; patcher après codegen.
-- [AshtechPay Gabon](ashtech-gabon.md) — country_code GA, currency XAF, opérateurs exacts "Airtel Money"/"Moov Money".
+- [AshtechPay Tchad](ashtech-gabon.md) — catalogue live confirmé : TD, XAF, opérateurs exacts "Airtel Money"/"Moov Money".
 - [MySQL migration](mysql-migration.md) — projet migré vers MySQL (Plesk Cybrancee, MYSQL_DATABASE_URL); incompatibilités .returning(), ::int casts, driver mysql2 requis dans api-server.

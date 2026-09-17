@@ -50,8 +50,9 @@ export default function AchatPage() {
 
   useEffect(() => {
     if (statusData) {
-      if (statusData.statut === 'SUCCESS') setStep('result');
-      else if (statusData.statut === 'FAILED') {
+      const statut = statusData.statut.toLowerCase();
+      if (statut === 'success') setStep('result');
+      else if (statut === 'failed') {
         setErrorMessage('Le paiement a échoué.');
         setStep('result');
       }

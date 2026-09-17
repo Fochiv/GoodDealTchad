@@ -50463,6 +50463,41 @@ var db = drizzle(pool, { schema: schema_exports, mode: "default" });
 var router3 = (0, import_express3.Router)();
 var ASHTECH_API_KEY = process.env.ASHTECH_API_KEY;
 var ASHTECH_BASE_URL = (process.env.ASHTECH_BASE_URL || "https://www.ashtechpay.com").replace(/\/+$/, "");
+var countriesCache = null;
+async function getAshtechCountries() {
+  if (countriesCache && countriesCache.expiresAt > Date.now()) {
+    return countriesCache.countries;
+  }
+  const response = await fetch(`${ASHTECH_BASE_URL}/v1/countries`, {
+    headers: { Authorization: `Bearer ${ASHTECH_API_KEY}` }
+  });
+  if (!response.ok) {
+    throw new Error(`AshtechPay countries request failed with status ${response.status}`);
+  }
+  const payload = await response.json();
+  if (!Array.isArray(payload)) {
+    throw new Error("AshtechPay countries response is invalid");
+  }
+  const countries = payload.filter((country) => {
+    if (!country || typeof country !== "object") return false;
+    const candidate = country;
+    return typeof candidate.code === "string" && typeof candidate.currency === "string" && Array.isArray(candidate.operators) && candidate.operators.every((operator) => typeof operator === "string");
+  });
+  countriesCache = { countries, expiresAt: Date.now() + 5 * 60 * 1e3 };
+  return countries;
+}
+async function resolveTchadPaymentOperator(paymentOperator) {
+  const countries = await getAshtechCountries();
+  const tchad = countries.find((country) => country.code === "TD");
+  if (!tchad) {
+    throw new Error("AshtechPay does not currently list Chad as an active country");
+  }
+  const operator = tchad.operators.find((candidate) => candidate === paymentOperator);
+  if (!operator) {
+    throw new Error(`AshtechPay does not currently list operator "${paymentOperator}" for Chad`);
+  }
+  return { currency: tchad.currency, operator };
+}
 router3.post("/paiement/initier", async (req, res) => {
   const parsed = InitierPaiementBody.safeParse(req.body);
   if (!parsed.success) {
@@ -50473,6 +50508,19 @@ router3.post("/paiement/initier", async (req, res) => {
   const forfait = FORFAITS.find((f) => f.id === forfaitId);
   if (!forfait) {
     res.status(400).json({ erreur: "bad_request", message: "Forfait introuvable", reference: null, ussdCode: null });
+    return;
+  }
+  let paymentConfig;
+  try {
+    paymentConfig = await resolveTchadPaymentOperator(paymentOperator);
+  } catch (err) {
+    req.log.error({ err }, "AshtechPay country/operator catalogue error");
+    res.status(503).json({
+      erreur: "provider_unavailable",
+      message: "Le service de paiement ne propose pas cet op\xE9rateur pour le Tchad.",
+      reference: null,
+      ussdCode: null
+    });
     return;
   }
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -50501,9 +50549,9 @@ router3.post("/paiement/initier", async (req, res) => {
       },
       body: JSON.stringify({
         amount: forfait.prix,
-        currency: "XAF",
+        currency: paymentConfig.currency,
         phone: paymentPhone,
-        operator: paymentOperator,
+        operator: paymentConfig.operator,
         country_code: "TD",
         reference
       })
@@ -50556,6 +50604,7 @@ router3.post("/paiement/otp", async (req, res) => {
   }
   const { reference, otp, paymentOperator, paymentPhone, montant } = parsed.data;
   try {
+    const paymentConfig = await resolveTchadPaymentOperator(paymentOperator);
     const ashtechResponse = await fetch(`${ASHTECH_BASE_URL}/v1/collect`, {
       method: "POST",
       headers: {
@@ -50564,9 +50613,9 @@ router3.post("/paiement/otp", async (req, res) => {
       },
       body: JSON.stringify({
         amount: montant,
-        currency: "XAF",
+        currency: paymentConfig.currency,
         phone: paymentPhone,
-        operator: paymentOperator,
+        operator: paymentConfig.operator,
         country_code: "TD",
         reference,
         otp

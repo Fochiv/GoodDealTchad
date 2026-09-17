@@ -1,23 +1,23 @@
 ---
-name: AshtechPay Gabon config
-description: Paramètres exacts pour appeler l'API AshtechPay pour le Gabon (Mobile Money Airtel/Moov).
+name: AshtechPay Tchad catalogue
+description: Valeurs du catalogue live AshtechPay pour les paiements Mobile Money du site Good Deal Tchad.
 ---
 
-## Paramètres POST /v1/collect pour le Gabon
+## Paramètres POST /v1/collect pour le Tchad
 
 ```json
 {
-  "country_code": "GA",
+  "country_code": "TD",
   "currency": "XAF",
   "operator": "Airtel Money",   // ou "Moov Money"
-  "phone": "06XXXXXXXX",
+  "phone": "235XXXXXXXX",
   "amount": 1200,
-  "reference": "FG-XXXXXXXX"
+  "reference": "ASHPAY-PAY-XXXXXXXX"
 }
 ```
 
-**Why:** La doc AshtechPay liste le Gabon avec currency "XAFG" en affichage, mais l'endpoint `/v1/collect` utilise "XAF" (code ISO standard pour le franc CFA). Les noms d'opérateurs exacts sont "Airtel Money" et "Moov Money".
+**Why:** Le catalogue live `/v1/countries` confirme le Tchad avec le code `TD`, la devise `XAF`, et les noms exacts `"Airtel Money"` et `"Moov Money"`. Le serveur ne doit pas supposer ces valeurs sans valider le catalogue.
 
-**How to apply:** Utiliser ces valeurs exactes dans les routes `/api/paiement/initier` et `/api/paiement/otp`.
+**How to apply:** Charger le catalogue côté serveur avec un cache court, sélectionner `TD`, puis utiliser la devise et la valeur d'opérateur retournées dans `/api/paiement/initier` et `/api/paiement/otp`.
 
-Flux pour le Gabon : USSD Push (202 pending) — le client valide sur son téléphone. Pas d'OTP USSD pour Airtel/Moov Gabon en théorie, mais gérer quand même le cas `otp_required`.
+Flux : consulter le statut après le `202 pending` et gérer le cas `otp_required` selon la réponse AshtechPay.

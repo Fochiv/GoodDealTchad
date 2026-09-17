@@ -53,8 +53,9 @@ _À compléter selon les retours utilisateur._
 ## Gotchas
 
 - Orval v8 génère `zod.int()` pour les champs `number` nullables — incompatible avec zod v3. Après codegen, patcher avec : `sed -i 's/zod\.int()/zod.number()/g' lib/api-zod/src/generated/api.ts` puis relancer `typecheck:libs`
-- L'API AshtechPay pour le Tchad utilise `country_code: "TD"` et `currency: "XAF"`
-- Opérateurs Tchad : `"Airtel Money"` et `"Moov Money"` (à confirmer depuis `/v1/countries` avec la clé marchande)
+- L'API AshtechPay utilise toujours `https://www.ashtechpay.com` comme base API documentée ; `https://doc.ashtechpay.com` est le domaine de documentation
+- Le catalogue AshtechPay confirme pour le Tchad : `country_code: "TD"`, `currency: "XAF"`, opérateurs exacts `"Airtel Money"` et `"Moov Money"`
+- Le serveur recharge et valide le catalogue `/v1/countries` avec un cache de 5 minutes avant chaque collecte
 
 ## Pointers
 
