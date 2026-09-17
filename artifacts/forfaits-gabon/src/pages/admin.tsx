@@ -53,7 +53,7 @@ const PERIOD_LABELS: Record<Period, string> = {
 };
 
 function formatXAF(amount: number) {
-  return new Intl.NumberFormat('fr-GA', {
+  return new Intl.NumberFormat('fr-TD', {
     style: 'currency',
     currency: 'XAF',
     maximumFractionDigits: 0,
@@ -90,7 +90,7 @@ function LoginWall({ onSuccess }: { onSuccess: () => void }) {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl border shadow-sm p-8 w-full max-w-sm">
         <div className="flex justify-center mb-6">
-          <img src={`${BASE}/logo-netforfait.png`} alt="NetForfait Gabon" className="h-10 object-contain" />
+          <img src={`${BASE}/logo-good-deal-tchad.png`} alt="Good Deal Tchad" className="h-12 object-contain" />
         </div>
         <h1 className="text-xl font-bold text-center text-gray-900 mb-6">Accès restreint</h1>
         <div className="space-y-4">
@@ -135,7 +135,7 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src={`${BASE}/logo-netforfait.png`} alt="NetForfait Gabon" className="h-8 object-contain" />
+          <img src={`${BASE}/logo-good-deal-tchad.png`} alt="Good Deal Tchad" className="h-10 object-contain" />
           <span className="font-bold text-lg text-gray-900">Panneau Admin</span>
         </div>
         <div className="flex items-center gap-2">

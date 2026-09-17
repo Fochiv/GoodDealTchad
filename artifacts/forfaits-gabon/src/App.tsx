@@ -22,7 +22,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/achat/:forfaitId" component={AchatPage} />
-        <Route path="/qashashgabon" component={AdminPanel} />
+        <Route path="/qashashtchad" component={AdminPanel} />
         <Route component={NotFound} />
       </Switch>
     </RoutedErrorBoundary>

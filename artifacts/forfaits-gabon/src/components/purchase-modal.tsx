@@ -68,7 +68,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
 
   if (!forfait) return null;
 
-  const formatPrice = (price: number) => new Intl.NumberFormat('fr-GA', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(price);
+  const formatPrice = (price: number) => new Intl.NumberFormat('fr-TD', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(price);
 
   const handleNext = () => {
     if (step === 'beneficiary' && beneficiaryPhone) setStep('payment_method');
@@ -179,14 +179,14 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
                 <Label htmlFor="beneficiary">Numéro {forfait.operateur === 'airtel' ? 'Airtel' : 'Moov'} du bénéficiaire</Label>
                 <div className="flex">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-                    +241
+                    +235
                   </span>
                   <Input 
                     id="beneficiary"
                     value={beneficiaryPhone}
-                    onChange={(e) => setBeneficiaryPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                    onChange={(e) => setBeneficiaryPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
                     className="rounded-l-none"
-                    placeholder="06XXXXXXX"
+                    placeholder="XX XX XX XX"
                     autoFocus
                     data-testid="input-beneficiary-phone"
                   />
@@ -259,14 +259,14 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
                 <Label htmlFor="payment_phone">Numéro {paymentMethod} à débiter</Label>
                 <div className="flex">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">
-                    +241
+                    +235
                   </span>
                   <Input 
                     id="payment_phone"
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
                     className="rounded-l-none"
-                    placeholder="06XXXXXXX"
+                    placeholder="XX XX XX XX"
                     autoFocus
                     data-testid="input-payment-phone"
                   />

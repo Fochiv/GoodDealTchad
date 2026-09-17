@@ -67,7 +67,7 @@ router.post("/paiement/initier", async (req, res) => {
         currency: "XAF",
         phone: paymentPhone,
         operator: paymentOperator,
-        country_code: "GA",
+        country_code: "TD",
         reference,
       }),
     });
@@ -155,7 +155,7 @@ router.post("/paiement/otp", async (req, res) => {
         currency: "XAF",
         phone: paymentPhone,
         operator: paymentOperator,
-        country_code: "GA",
+        country_code: "TD",
         reference,
         otp,
       }),

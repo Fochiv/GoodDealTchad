@@ -59,7 +59,7 @@ export default function AchatPage() {
   }, [statusData]);
 
   const formatPrice = (price: number) =>
-    new Intl.NumberFormat('fr-GA', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(price);
+    new Intl.NumberFormat('fr-TD', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(price);
 
   const submitPayment = () => {
     if (!forfait) return;
@@ -165,7 +165,7 @@ export default function AchatPage() {
               <ArrowLeft className="h-5 w-5" />
             </button>
           )}
-          <img src={`${BASE}/logo-netforfait.png`} alt="NetForfait Gabon" className="h-8 object-contain" />
+          <img src={`${BASE}/logo-good-deal-tchad.png`} alt="Good Deal Tchad" className="h-10 object-contain" />
           <div className="ml-auto text-right">
             <div className="font-bold text-sm" style={{ color: accentColor }}>{forfait.volume}</div>
             <div className="text-xs text-muted-foreground">{formatPrice(forfait.prix)}</div>
@@ -217,13 +217,13 @@ export default function AchatPage() {
               <div className="space-y-2">
                 <Label htmlFor="beneficiary">Numéro {forfait.operateur === 'airtel' ? 'Airtel' : 'Moov'}</Label>
                 <div className="flex">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">+241</span>
+                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">+235</span>
                   <Input
                     id="beneficiary"
                     value={beneficiaryPhone}
-                    onChange={(e) => setBeneficiaryPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                    onChange={(e) => setBeneficiaryPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
                     className="rounded-l-none text-lg h-12"
-                    placeholder="06XXXXXXX"
+                    placeholder="XX XX XX XX"
                     autoFocus
                     inputMode="numeric"
                   />
@@ -294,13 +294,13 @@ export default function AchatPage() {
               <div className="space-y-2">
                 <Label htmlFor="payment_phone">Numéro Mobile Money</Label>
                 <div className="flex">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">+241</span>
+                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm">+235</span>
                   <Input
                     id="payment_phone"
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
                     className="rounded-l-none text-lg h-12"
-                    placeholder="06XXXXXXX"
+                    placeholder="XX XX XX XX"
                     autoFocus
                     inputMode="numeric"
                   />
@@ -331,7 +331,7 @@ export default function AchatPage() {
               <div className="text-center space-y-2">
                 <h2 className="text-xl font-bold">Vérifiez votre téléphone</h2>
                 <p className="text-muted-foreground text-sm max-w-xs">
-                  Un message USSD a été envoyé sur le <span className="font-medium">+241 {paymentPhone}</span>. Validez sur votre téléphone.
+                  Un message USSD a été envoyé sur le <span className="font-medium">+235 {paymentPhone}</span>. Validez sur votre téléphone.
                 </p>
               </div>
             </div>
@@ -399,7 +399,7 @@ export default function AchatPage() {
                   <div className="text-center space-y-2">
                     <h2 className="text-xl font-bold text-green-700">Forfait activé !</h2>
                     <p className="text-sm text-muted-foreground">
-                      Votre forfait <span className="font-medium">{forfait.volume}</span> a été activé avec succès sur le numéro <span className="font-medium">+241 {beneficiaryPhone}</span>.
+                      Votre forfait <span className="font-medium">{forfait.volume}</span> a été activé avec succès sur le numéro <span className="font-medium">+235 {beneficiaryPhone}</span>.
                     </p>
                   </div>
                   <Button

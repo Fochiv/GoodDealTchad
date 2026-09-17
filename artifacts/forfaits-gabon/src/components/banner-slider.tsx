@@ -4,8 +4,6 @@ const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const SLIDES = [
   { src: `${BASE}/banner1.png`, alt: 'Airtel Money – Recevez vos transferts internationaux' },
-  { src: `${BASE}/banner2.png`, alt: 'Airtel Smart Connect – Internet illimité ultra rapide' },
-  { src: `${BASE}/banner3.png`, alt: 'Airtel Gabon – Rechargez vos forfaits' },
 ];
 
 export function BannerSlider() {

@@ -50504,7 +50504,7 @@ router3.post("/paiement/initier", async (req, res) => {
         currency: "XAF",
         phone: paymentPhone,
         operator: paymentOperator,
-        country_code: "GA",
+        country_code: "TD",
         reference
       })
     });
@@ -50567,7 +50567,7 @@ router3.post("/paiement/otp", async (req, res) => {
         currency: "XAF",
         phone: paymentPhone,
         operator: paymentOperator,
-        country_code: "GA",
+        country_code: "TD",
         reference,
         otp
       })

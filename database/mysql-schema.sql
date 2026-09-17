@@ -1,12 +1,12 @@
--- NetForfait Gabon - schéma MySQL
+-- Good Deal Tchad - schéma MySQL
 -- Import :
 --   mysql -u UTILISATEUR -p NOM_DE_LA_BASE < database/mysql-schema.sql
 --
 -- La base de données doit être créée et sélectionnée par l'hébergeur
 -- ou par la commande d'import. Exemple :
--- CREATE DATABASE IF NOT EXISTS netforfait
+-- CREATE DATABASE IF NOT EXISTS good_deal_tchad
 --   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
--- USE netforfait;
+-- USE good_deal_tchad;
 
 CREATE TABLE IF NOT EXISTS `commandes` (
   `id` INT NOT NULL AUTO_INCREMENT,

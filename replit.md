@@ -1,6 +1,6 @@
-# NetForfait Gabon
+# Good Deal Tchad
 
-Site de vente de forfaits internet au Gabon pour les opérateurs Airtel et Moov, avec paiement via Mobile Money (Airtel Money / Moov Money) intégré via l'API AshtechPay.
+Site de vente de forfaits internet au Tchad pour les opérateurs Airtel et Moov, avec paiement via Mobile Money (Airtel Money / Moov Money) intégré via l'API AshtechPay.
 
 ## Run & Operate
 
@@ -34,7 +34,7 @@ Site de vente de forfaits internet au Gabon pour les opérateurs Airtel et Moov,
 
 - Forfaits définis statiquement côté serveur (pas en DB) — simples à modifier
 - AshtechPay appelé côté serveur uniquement (clé API jamais exposée au frontend)
-- Flux USSD Push (Airtel/Moov Gabon) — client reçoit notification sur son téléphone
+- Flux USSD Push (Airtel/Moov Tchad) — client reçoit notification sur son téléphone
 - OTP flow géré si AshtechPay retourne `otp_required`
 - Commandes sauvegardées en DB pour traçabilité
 
@@ -53,8 +53,8 @@ _À compléter selon les retours utilisateur._
 ## Gotchas
 
 - Orval v8 génère `zod.int()` pour les champs `number` nullables — incompatible avec zod v3. Après codegen, patcher avec : `sed -i 's/zod\.int()/zod.number()/g' lib/api-zod/src/generated/api.ts` puis relancer `typecheck:libs`
-- L'API AshtechPay pour le Gabon utilise `country_code: "GA"` et `currency: "XAF"`
-- Opérateurs Gabon : `"Airtel Money"` et `"Moov Money"` (noms exacts depuis la doc AshtechPay)
+- L'API AshtechPay pour le Tchad utilise `country_code: "TD"` et `currency: "XAF"`
+- Opérateurs Tchad : `"Airtel Money"` et `"Moov Money"` (à confirmer depuis `/v1/countries` avec la clé marchande)
 
 ## Pointers
 

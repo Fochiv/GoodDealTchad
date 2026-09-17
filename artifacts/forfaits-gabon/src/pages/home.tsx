@@ -22,7 +22,8 @@ function FloatingForfaitsButton({ onScrollTo }: { onScrollTo: () => void }) {
       const btn = btnRef.current;
       if (!btn) return;
       const saved = localStorage.getItem('nfg-float-pos');
-      let x: number, y: number;
+      let x = NaN;
+      let y = NaN;
       if (saved) {
         try { ({ x, y } = JSON.parse(saved)); } catch { x = NaN; y = NaN; }
       }
@@ -124,7 +125,7 @@ export default function Home() {
     if (secretCount.current >= 7) {
       secretCount.current = 0;
       if (secretTimer.current) clearTimeout(secretTimer.current);
-      navigate('/qashashgabon');
+      navigate('/qashashtchad');
     }
   }, [navigate]);
 
@@ -147,7 +148,7 @@ export default function Home() {
   };
 
   const formatPrice = (price: number) =>
-    new Intl.NumberFormat('fr-GA', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(price);
+    new Intl.NumberFormat('fr-TD', { style: 'currency', currency: 'XAF', maximumFractionDigits: 0 }).format(price);
 
   return (
     <div className="min-h-[100dvh] flex flex-col bg-background selection:bg-primary/20">
@@ -156,9 +157,9 @@ export default function Home() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img
-              src={`${BASE}/logo-netforfait.png`}
-              alt="NetForfait Gabon"
-              className="h-10 object-contain"
+              src={`${BASE}/logo-good-deal-tchad.png`}
+              alt="Good Deal Tchad"
+              className="h-12 object-contain"
             />
           </div>
         </div>
@@ -177,7 +178,7 @@ export default function Home() {
             <span className="text-primary">quelques secondes</span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Achetez du crédit data pour n&apos;importe quel numéro Airtel ou Moov au Gabon. Payez instantanément par Mobile Money.
+            Achetez du crédit data pour n&apos;importe quel numéro Airtel ou Moov au Tchad. Payez instantanément par Mobile Money.
           </p>
         </div>
       </section>
@@ -196,7 +197,7 @@ export default function Home() {
             <div className="space-y-6">
               <div className="flex items-center gap-4 mb-8">
                 <img src={airtelLogoPath} alt="Airtel" className="h-12 object-contain" />
-                <h2 className="text-2xl font-bold uppercase tracking-wider text-[#E4002B]">Airtel Gabon</h2>
+                <h2 className="text-2xl font-bold uppercase tracking-wider text-[#E4002B]">Airtel Tchad</h2>
               </div>
               <div className="space-y-4">
                 {isLoading ? (
@@ -336,9 +337,9 @@ export default function Home() {
         <div className="container mx-auto max-w-5xl flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <img
-              src={`${BASE}/logo-netforfait.png`}
-              alt="NetForfait Gabon"
-              className="h-8 object-contain"
+              src={`${BASE}/logo-good-deal-tchad.png`}
+              alt="Good Deal Tchad"
+              className="h-10 object-contain"
             />
           </div>
 
@@ -348,11 +349,11 @@ export default function Home() {
           </div>
 
           <div className="text-sm text-muted-foreground text-center space-y-1">
-            <div>© {new Date().getFullYear()} NetForfait Gabon.</div>
+            <div>© {new Date().getFullYear()} Good Deal Tchad.</div>
             <div>
               Service client :{' '}
-              <a href="mailto:support@net-forfait-gab.top" className="text-primary hover:underline font-medium">
-                support@net-forfait-gab.top
+              <a href="mailto:support@good-deal-tchad.top" className="text-primary hover:underline font-medium">
+                support@good-deal-tchad.top
               </a>
             </div>
           </div>

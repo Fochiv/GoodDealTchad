@@ -3,7 +3,7 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification for Forfaits Internet Gabon
+  description: API specification for Good Deal Tchad
 servers:
   - url: /api
     description: Base API path
@@ -34,7 +34,7 @@ paths:
       operationId: listForfaits
       tags: [forfaits]
       summary: Liste des forfaits internet disponibles
-      description: Retourne tous les forfaits Airtel et Moov disponibles au Gabon
+      description: Retourne tous les forfaits Airtel et Moov disponibles au Tchad
       responses:
         "200":
           description: Liste des forfaits
@@ -50,7 +50,7 @@ paths:
       operationId: initierPaiement
       tags: [paiement]
       summary: Initier un paiement Mobile Money
-      description: Initie un paiement via Airtel Money ou Moov Money au Gabon
+      description: Initie un paiement via Airtel Money ou Moov Money au Tchad
       requestBody:
         required: true
         content:
