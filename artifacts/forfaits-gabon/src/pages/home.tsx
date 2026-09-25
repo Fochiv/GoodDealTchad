@@ -136,11 +136,13 @@ export default function Home() {
   const displayAirtel = airtelForfaits.length > 0 ? airtelForfaits : [
     { id: 'a1', operateur: 'airtel', volume: '5Go', prix: 1100, validite: '7 jours', validiteJours: 7 } as Forfait,
     { id: 'a2', operateur: 'airtel', volume: '15Go', prix: 3100, validite: '30 jours', validiteJours: 30 } as Forfait,
+    { id: 'airtel-go-illimites-30j', operateur: 'airtel', volume: 'Go illimités', prix: 5500, validite: '30 jours', validiteJours: 30 } as Forfait,
   ];
 
   const displayMoov = moovForfaits.length > 0 ? moovForfaits : [
     { id: 'm1', operateur: 'moov', volume: '6Go', prix: 1200, validite: '7 jours', validiteJours: 7 } as Forfait,
     { id: 'm2', operateur: 'moov', volume: '13Go', prix: 2600, validite: '30 jours', validiteJours: 30 } as Forfait,
+    { id: 'moov-go-illimites-30j', operateur: 'moov', volume: 'Go illimités', prix: 5500, validite: '30 jours', validiteJours: 30 } as Forfait,
   ];
 
   const handleBuy = (forfait: Forfait) => {

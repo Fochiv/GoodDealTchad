@@ -23,6 +23,15 @@ const FORFAITS = [
     description: "Forfait internet Moov 13Go valable 30 jours",
   },
   {
+    id: "moov-go-illimites-30j",
+    operateur: "moov",
+    volume: "Go illimités",
+    prix: 5500,
+    validite: "30 jours",
+    validiteJours: 30,
+    description: "Forfait internet Moov Go illimités valable 30 jours",
+  },
+  {
     id: "airtel-5go-7j",
     operateur: "airtel",
     volume: "5 Go",
@@ -39,6 +48,15 @@ const FORFAITS = [
     validite: "30 jours",
     validiteJours: 30,
     description: "Forfait internet Airtel 15Go valable 30 jours",
+  },
+  {
+    id: "airtel-go-illimites-30j",
+    operateur: "airtel",
+    volume: "Go illimités",
+    prix: 5500,
+    validite: "30 jours",
+    validiteJours: 30,
+    description: "Forfait internet Airtel Go illimités valable 30 jours",
   },
 ];
 
