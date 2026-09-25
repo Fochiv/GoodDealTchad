@@ -339,10 +339,6 @@ export default function AchatPage() {
                     maxLength={9}
                   />
                 </div>
-                <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
-                  <p className="font-semibold">Numéros de simulation AshTechPay — aucun débit réel</p>
-                  <p className="mt-1">000000001 succès · 000000002 attente · 000000003 échec · 000000004 OTP (code 000000) · 000000005 annulation</p>
-                </div>
               </div>
               <div className="flex justify-between items-center p-4 bg-white border rounded-xl">
                 <span className="text-muted-foreground text-sm">Total à payer</span>
