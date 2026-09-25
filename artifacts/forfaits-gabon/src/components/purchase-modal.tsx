@@ -304,13 +304,13 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
                   <Input 
                     id="payment_phone"
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
                     className="rounded-l-none"
                     placeholder="XX XX XX XX"
                     autoFocus
                     data-testid="input-payment-phone"
                     inputMode="numeric"
-                    maxLength={9}
+                    maxLength={8}
                   />
                 </div>
               </div>
@@ -323,7 +323,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
               <Button 
                 className="w-full" 
                 size="lg"
-                disabled={paymentPhone.length !== 8 && !/^00000000[1-5]$/.test(paymentPhone)}
+                disabled={paymentPhone.length !== 8}
                 onClick={handleNext}
                 data-testid="button-submit-payment"
               >

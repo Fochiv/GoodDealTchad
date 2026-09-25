@@ -331,12 +331,12 @@ export default function AchatPage() {
                   <Input
                     id="payment_phone"
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
+                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
                     className="rounded-l-none text-lg h-12"
                     placeholder="XX XX XX XX"
                     autoFocus
                     inputMode="numeric"
-                    maxLength={9}
+                    maxLength={8}
                   />
                 </div>
               </div>
@@ -347,7 +347,7 @@ export default function AchatPage() {
               <Button
                 className="w-full h-12 text-base rounded-xl text-white"
                 style={{ backgroundColor: accentColor }}
-                disabled={paymentPhone.length !== 8 && !/^00000000[1-5]$/.test(paymentPhone)}
+                disabled={paymentPhone.length !== 8}
                 onClick={submitPayment}
               >
                 Obtenir mon forfait
