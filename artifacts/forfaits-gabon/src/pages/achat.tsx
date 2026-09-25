@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle2, XCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, ArrowLeft, Clock3 } from 'lucide-react';
 import {
   useListForfaits,
   useInitierPaiement,
@@ -19,6 +19,7 @@ import moovLogoPath from '@assets/IMG_8244_1786998122601.png';
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 type Step = 'beneficiary' | 'payment_method' | 'payment_phone' | 'processing' | 'otp' | 'result';
+type SimulationStatus = 'success' | 'pending' | 'failed' | 'cancelled';
 
 export default function AchatPage() {
   const params = useParams<{ forfaitId: string }>();
@@ -36,6 +37,7 @@ export default function AchatPage() {
   const [ussdCode, setUssdCode] = useState('');
   const [otp, setOtp] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [simulationStatus, setSimulationStatus] = useState<SimulationStatus | null>(null);
 
   const initierPaiement = useInitierPaiement();
   const confirmerOtp = useConfirmerOtp();
@@ -65,6 +67,7 @@ export default function AchatPage() {
   const submitPayment = () => {
     if (!forfait) return;
     setErrorMessage('');
+    setSimulationStatus(null);
     setStep('processing');
     initierPaiement.mutate(
       {
@@ -77,7 +80,20 @@ export default function AchatPage() {
       },
       {
         onSuccess: (data) => {
-          setTransactionId(data.transactionId);
+          if (data.simulation) {
+            const status = data.statut.toLowerCase() as SimulationStatus;
+            setSimulationStatus(status);
+            setErrorMessage(
+              status === 'failed'
+                ? 'Résultat simulé : paiement refusé. Aucun débit réel n’a eu lieu.'
+                : status === 'cancelled'
+                  ? 'Résultat simulé : paiement annulé. Aucun débit réel n’a eu lieu.'
+                  : '',
+            );
+            setStep('result');
+            return;
+          }
+          if (data.transactionId) setTransactionId(data.transactionId);
           if (data.reference) setReference(data.reference);
         },
         onError: (err: any) => {
@@ -98,6 +114,7 @@ export default function AchatPage() {
   const submitOtp = () => {
     if (!forfait) return;
     setErrorMessage('');
+    setSimulationStatus(null);
     setStep('processing');
     confirmerOtp.mutate(
       {
@@ -112,7 +129,22 @@ export default function AchatPage() {
         },
       },
       {
-        onSuccess: (data) => setTransactionId(data.transactionId),
+        onSuccess: (data) => {
+          if (data.simulation) {
+            const status = data.statut.toLowerCase() as SimulationStatus;
+            setSimulationStatus(status);
+            setErrorMessage(
+              status === 'failed'
+                ? 'Résultat simulé : paiement refusé. Aucun débit réel n’a eu lieu.'
+                : status === 'cancelled'
+                  ? 'Résultat simulé : paiement annulé. Aucun débit réel n’a eu lieu.'
+                  : '',
+            );
+            setStep('result');
+            return;
+          }
+          if (data.transactionId) setTransactionId(data.transactionId);
+        },
         onError: (err: any) => {
           const errorData = err?.data;
           setErrorMessage(errorData?.message || 'Code incorrect ou expiré.');
@@ -299,12 +331,17 @@ export default function AchatPage() {
                   <Input
                     id="payment_phone"
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
                     className="rounded-l-none text-lg h-12"
                     placeholder="XX XX XX XX"
                     autoFocus
                     inputMode="numeric"
+                    maxLength={9}
                   />
+                </div>
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+                  <p className="font-semibold">Numéros de simulation AshTechPay — aucun débit réel</p>
+                  <p className="mt-1">000000001 succès · 000000002 attente · 000000003 échec · 000000004 OTP (code 000000) · 000000005 annulation</p>
                 </div>
               </div>
               <div className="flex justify-between items-center p-4 bg-white border rounded-xl">
@@ -314,7 +351,7 @@ export default function AchatPage() {
               <Button
                 className="w-full h-12 text-base rounded-xl text-white"
                 style={{ backgroundColor: accentColor }}
-                disabled={paymentPhone.length < 8}
+                disabled={paymentPhone.length !== 8 && !/^00000000[1-5]$/.test(paymentPhone)}
                 onClick={submitPayment}
               >
                 Obtenir mon forfait
@@ -347,7 +384,11 @@ export default function AchatPage() {
               <div>
                 <h2 className="text-xl font-bold mb-1">Code de validation</h2>
                 <p className="text-muted-foreground text-sm">
-                  {ussdCode ? `Composez ${ussdCode} et entrez le code affiché.` : 'Entrez le code reçu par SMS.'}
+                  {ussdCode === '#SANDBOX#'
+                    ? 'Simulation AshTechPay : entrez le code fictif 000000. Aucun SMS ou USSD réel ne sera envoyé.'
+                    : ussdCode
+                      ? `Composez ${ussdCode} et entrez le code affiché.`
+                      : 'Entrez le code reçu par SMS.'}
                 </p>
               </div>
               <Input
@@ -372,7 +413,18 @@ export default function AchatPage() {
           {/* Step: Résultat */}
           {step === 'result' && (
             <div className="flex flex-col items-center justify-center py-12 space-y-6">
-              {errorMessage ? (
+              {simulationStatus === 'pending' ? (
+                <>
+                  <div className="h-20 w-20 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Clock3 className="h-10 w-10 text-blue-600" />
+                  </div>
+                  <div className="text-center space-y-2">
+                    <h2 className="text-xl font-bold text-blue-700">Simulation en attente</h2>
+                    <p className="text-sm text-muted-foreground">AshTechPay n’a créé aucune transaction pour ce scénario de test. Aucun débit réel n’a eu lieu.</p>
+                  </div>
+                  <Button className="w-full" onClick={() => navigate('/')}>Retour à l'accueil</Button>
+                </>
+              ) : errorMessage ? (
                 <>
                   <div className="h-20 w-20 bg-destructive/10 rounded-full flex items-center justify-center">
                     <XCircle className="h-10 w-10 text-destructive" />
@@ -398,10 +450,19 @@ export default function AchatPage() {
                     <CheckCircle2 className="h-10 w-10 text-green-600" />
                   </div>
                   <div className="text-center space-y-2">
-                    <h2 className="text-xl font-bold text-green-700">Forfait activé !</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Votre forfait <span className="font-medium">{forfait.volume}</span> a été activé avec succès sur le numéro <span className="font-medium">+235 {beneficiaryPhone}</span>.
-                    </p>
+                    {simulationStatus === 'success' ? (
+                      <>
+                        <h2 className="text-xl font-bold text-green-700">Simulation réussie</h2>
+                        <p className="text-sm text-muted-foreground">AshTechPay a confirmé le scénario de test. Aucun débit réel ni activation de forfait n’a eu lieu.</p>
+                      </>
+                    ) : (
+                      <>
+                        <h2 className="text-xl font-bold text-green-700">Forfait activé !</h2>
+                        <p className="text-sm text-muted-foreground">
+                          Votre forfait <span className="font-medium">{forfait.volume}</span> a été activé avec succès sur le numéro <span className="font-medium">+235 {beneficiaryPhone}</span>.
+                        </p>
+                      </>
+                    )}
                   </div>
                   <Button
                     className="w-full h-12 text-base rounded-xl text-white bg-green-600 hover:bg-green-700"

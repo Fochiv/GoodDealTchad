@@ -7,10 +7,12 @@
  */
 
 export interface PaiementReponse {
-  transactionId: string;
+  /** @nullable */
+  transactionId: string | null;
   /** @nullable */
   reference?: string | null;
   statut: string;
+  simulation?: boolean;
   /** @nullable */
   montant?: number | null;
   /** @nullable */

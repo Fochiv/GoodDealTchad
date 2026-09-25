@@ -207,11 +207,13 @@ components:
       required: [transactionId, statut]
       properties:
         transactionId:
-          type: string
+          type: ["string", "null"]
         reference:
           type: ["string", "null"]
         statut:
           type: string
+        simulation:
+          type: boolean
         montant:
           type: ["integer", "null"]
         montantNet:

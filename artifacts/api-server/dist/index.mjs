@@ -32585,9 +32585,10 @@ var InitierPaiementBody = objectType({
   "paymentPhone": stringType()
 });
 var InitierPaiementResponse = objectType({
-  "transactionId": stringType(),
+  "transactionId": stringType().nullable(),
   "reference": stringType().nullish(),
   "statut": stringType(),
+  "simulation": booleanType().optional(),
   "montant": numberType().nullish(),
   "montantNet": numberType().nullish(),
   "operateur": stringType().nullish(),
@@ -32603,9 +32604,10 @@ var ConfirmerOtpBody = objectType({
   "montant": numberType()
 });
 var ConfirmerOtpResponse = objectType({
-  "transactionId": stringType(),
+  "transactionId": stringType().nullable(),
   "reference": stringType().nullish(),
   "statut": stringType(),
+  "simulation": booleanType().optional(),
   "montant": numberType().nullish(),
   "montantNet": numberType().nullish(),
   "operateur": stringType().nullish(),
@@ -50550,13 +50552,31 @@ router3.post("/paiement/initier", async (req, res) => {
       body: JSON.stringify({
         amount: forfait.prix,
         currency: paymentConfig.currency,
-        phone: paymentPhone,
+        phone: paymentPhone.startsWith("+") ? paymentPhone : `+235${paymentPhone}`,
         operator: paymentConfig.operator,
         country_code: "TD",
         reference
       })
     });
     const ashtechData = await ashtechResponse.json();
+    if (ashtechData.sandbox === true && ashtechData.simulation === true && typeof ashtechData.status === "string") {
+      const simulatedStatus = ashtechData.status.toLowerCase();
+      if (!["success", "pending", "failed", "cancelled"].includes(simulatedStatus)) {
+        throw new Error("AshtechPay returned an unsupported sandbox status");
+      }
+      await db.update(commandesTable).set({ transactionId: null, statut: `simulation_${simulatedStatus}` }).where(eq(commandesTable.id, commande.id));
+      res.status(202).json({
+        transactionId: null,
+        reference,
+        statut: simulatedStatus,
+        montant: ashtechData.amount ?? forfait.prix,
+        montantNet: ashtechData.credited_amount ?? null,
+        operateur: paymentConfig.operator,
+        telephone: paymentPhone.startsWith("+") ? paymentPhone : `+235${paymentPhone}`,
+        simulation: true
+      });
+      return;
+    }
     if (ashtechResponse.status === 202) {
       await db.update(commandesTable).set({ transactionId: ashtechData.transaction_id, statut: "pending" }).where(eq(commandesTable.id, commande.id));
       res.status(202).json({
@@ -50569,11 +50589,12 @@ router3.post("/paiement/initier", async (req, res) => {
         telephone: paymentPhone
       });
     } else if (ashtechResponse.status === 400 && ashtechData.error === "otp_required") {
-      await db.update(commandesTable).set({ reference: ashtechData.reference, statut: "otp_required" }).where(eq(commandesTable.id, commande.id));
+      const otpReference = typeof ashtechData.reference === "string" && ashtechData.reference ? ashtechData.reference : reference;
+      await db.update(commandesTable).set({ reference: otpReference, statut: "otp_required" }).where(eq(commandesTable.id, commande.id));
       res.status(400).json({
         erreur: "otp_required",
         message: ashtechData.message,
-        reference: ashtechData.reference,
+        reference: otpReference,
         ussdCode: ashtechData.ussd_code || null
       });
     } else {
@@ -50614,7 +50635,7 @@ router3.post("/paiement/otp", async (req, res) => {
       body: JSON.stringify({
         amount: montant,
         currency: paymentConfig.currency,
-        phone: paymentPhone,
+        phone: paymentPhone.startsWith("+") ? paymentPhone : `+235${paymentPhone}`,
         operator: paymentConfig.operator,
         country_code: "TD",
         reference,
@@ -50622,6 +50643,24 @@ router3.post("/paiement/otp", async (req, res) => {
       })
     });
     const ashtechData = await ashtechResponse.json();
+    if (ashtechData.sandbox === true && ashtechData.simulation === true && typeof ashtechData.status === "string") {
+      const simulatedStatus = ashtechData.status.toLowerCase();
+      if (!["success", "pending", "failed", "cancelled"].includes(simulatedStatus)) {
+        throw new Error("AshtechPay returned an unsupported sandbox status");
+      }
+      await db.update(commandesTable).set({ transactionId: null, statut: `simulation_${simulatedStatus}` }).where(eq(commandesTable.reference, reference));
+      res.status(202).json({
+        transactionId: null,
+        reference,
+        statut: simulatedStatus,
+        montant: ashtechData.amount ?? montant,
+        montantNet: ashtechData.credited_amount ?? null,
+        operateur: paymentConfig.operator,
+        telephone: paymentPhone.startsWith("+") ? paymentPhone : `+235${paymentPhone}`,
+        simulation: true
+      });
+      return;
+    }
     if (ashtechResponse.status === 202) {
       await db.update(commandesTable).set({ transactionId: ashtechData.transaction_id, statut: "pending" }).where(eq(commandesTable.reference, reference));
       res.status(202).json({

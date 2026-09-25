@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CheckCircle2, XCircle, Loader2, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, Loader2, ArrowLeft, Clock3 } from 'lucide-react';
 import { useInitierPaiement, useStatutPaiement, useConfirmerOtp, Forfait, PaiementInputPaymentOperator, getStatutPaiementQueryKey } from '@workspace/api-client-react';
 import airtelLogoPath from '@assets/IMG_8238_1786998122601.jpeg';
 import moovLogoPath from '@assets/IMG_8244_1786998122601.png';
@@ -15,6 +15,7 @@ interface PurchaseModalProps {
 }
 
 type Step = 'beneficiary' | 'payment_method' | 'payment_phone' | 'processing' | 'otp' | 'result';
+type SimulationStatus = 'success' | 'pending' | 'failed' | 'cancelled';
 
 export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProps) {
   const [step, setStep] = useState<Step>('beneficiary');
@@ -27,6 +28,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
   const [ussdCode, setUssdCode] = useState<string>('');
   const [otp, setOtp] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [simulationStatus, setSimulationStatus] = useState<SimulationStatus | null>(null);
 
   const initierPaiement = useInitierPaiement();
   const confirmerOtp = useConfirmerOtp();
@@ -64,6 +66,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
       setUssdCode('');
       setOtp('');
       setErrorMessage('');
+      setSimulationStatus(null);
     }
   }, [open, forfait]);
 
@@ -79,6 +82,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
 
   const submitPayment = () => {
     setErrorMessage('');
+    setSimulationStatus(null);
     setStep('processing');
     
     initierPaiement.mutate({
@@ -90,7 +94,20 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
       }
     }, {
       onSuccess: (data) => {
-        setTransactionId(data.transactionId);
+        if (data.simulation) {
+          const status = data.statut.toLowerCase() as SimulationStatus;
+          setSimulationStatus(status);
+          setErrorMessage(
+            status === 'failed'
+              ? 'Résultat simulé : paiement refusé. Aucun débit réel n’a eu lieu.'
+              : status === 'cancelled'
+                ? 'Résultat simulé : paiement annulé. Aucun débit réel n’a eu lieu.'
+                : '',
+          );
+          setStep('result');
+          return;
+        }
+        if (data.transactionId) setTransactionId(data.transactionId);
         if (data.reference) setReference(data.reference);
       },
       onError: (err: any) => {
@@ -109,6 +126,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
 
   const submitOtp = () => {
     setErrorMessage('');
+    setSimulationStatus(null);
     setStep('processing');
     
     confirmerOtp.mutate({
@@ -123,7 +141,20 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
       }
     }, {
       onSuccess: (data) => {
-        setTransactionId(data.transactionId);
+        if (data.simulation) {
+          const status = data.statut.toLowerCase() as SimulationStatus;
+          setSimulationStatus(status);
+          setErrorMessage(
+            status === 'failed'
+              ? 'Résultat simulé : paiement refusé. Aucun débit réel n’a eu lieu.'
+              : status === 'cancelled'
+                ? 'Résultat simulé : paiement annulé. Aucun débit réel n’a eu lieu.'
+                : '',
+          );
+          setStep('result');
+          return;
+        }
+        if (data.transactionId) setTransactionId(data.transactionId);
       },
       onError: (err: any) => {
         const errorData = err?.data;
@@ -157,7 +188,15 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
 
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold">
-            {step === 'result' ? (errorMessage ? 'Échec' : 'Succès') : 'Acheter le forfait'}
+            {step === 'result'
+              ? simulationStatus === 'pending'
+                ? 'Simulation en attente'
+                : errorMessage
+                  ? 'Échec'
+                  : simulationStatus === 'success'
+                    ? 'Simulation réussie'
+                    : 'Succès'
+              : 'Acheter le forfait'}
           </DialogTitle>
           <DialogDescription className="text-center">
             {step !== 'result' && step !== 'processing' && `${forfait.volume} • ${formatPrice(forfait.prix)}`}
@@ -265,12 +304,18 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
                   <Input 
                     id="payment_phone"
                     value={paymentPhone}
-                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    onChange={(e) => setPaymentPhone(e.target.value.replace(/\D/g, '').slice(0, 9))}
                     className="rounded-l-none"
                     placeholder="XX XX XX XX"
                     autoFocus
                     data-testid="input-payment-phone"
+                    inputMode="numeric"
+                    maxLength={9}
                   />
+                </div>
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+                  <p className="font-semibold">Numéros de simulation AshTechPay — aucun débit réel</p>
+                  <p className="mt-1">000000001 succès · 000000002 attente · 000000003 échec · 000000004 OTP (code 000000) · 000000005 annulation</p>
                 </div>
               </div>
               
@@ -282,7 +327,7 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
               <Button 
                 className="w-full" 
                 size="lg"
-                disabled={paymentPhone.length < 8}
+                disabled={paymentPhone.length !== 8 && !/^00000000[1-5]$/.test(paymentPhone)}
                 onClick={handleNext}
                 data-testid="button-submit-payment"
               >
@@ -314,9 +359,11 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Validation requise</h3>
                 <p className="text-sm text-muted-foreground">
-                  {ussdCode 
-                    ? `Composez ${ussdCode} et entrez le code affiché ci-dessous.` 
-                    : 'Entrez le code reçu par SMS sur votre téléphone.'}
+                  {ussdCode === '#SANDBOX#'
+                    ? 'Simulation AshTechPay : entrez le code fictif 000000. Aucun SMS ou USSD réel ne sera envoyé.'
+                    : ussdCode
+                      ? `Composez ${ussdCode} et entrez le code affiché ci-dessous.`
+                      : 'Entrez le code reçu par SMS sur votre téléphone.'}
                 </p>
               </div>
               
@@ -345,7 +392,15 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
 
           {step === 'result' && (
             <div className="flex flex-col items-center justify-center py-6 space-y-4">
-              {errorMessage ? (
+              {simulationStatus === 'pending' ? (
+                <>
+                  <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Clock3 className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <p className="text-sm text-center text-muted-foreground">AshTechPay n’a créé aucune transaction pour ce scénario de test. Aucun débit réel n’a eu lieu.</p>
+                  <Button className="w-full mt-4" onClick={() => onOpenChange(false)}>Fermer</Button>
+                </>
+              ) : errorMessage ? (
                 <>
                   <div className="h-16 w-16 bg-destructive/10 rounded-full flex items-center justify-center">
                     <XCircle className="h-8 w-8 text-destructive" />
@@ -368,9 +423,13 @@ export function PurchaseModal({ open, onOpenChange, forfait }: PurchaseModalProp
                     <CheckCircle2 className="h-8 w-8 text-green-600" />
                   </div>
                   <div className="text-center space-y-2">
-                    <p className="text-sm font-medium">
-                      Votre forfait {forfait.volume} a été activé avec succès sur le numéro {beneficiaryPhone} !
-                    </p>
+                    {simulationStatus === 'success' ? (
+                      <p className="text-sm font-medium">AshTechPay a confirmé le scénario de test. Aucun débit réel ni activation de forfait n’a eu lieu.</p>
+                    ) : (
+                      <p className="text-sm font-medium">
+                        Votre forfait {forfait.volume} a été activé avec succès sur le numéro {beneficiaryPhone} !
+                      </p>
+                    )}
                   </div>
                   <Button 
                     className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white" 

@@ -45,9 +45,10 @@ export const InitierPaiementBody = zod.object({
 })
 
 export const InitierPaiementResponse = zod.object({
-  "transactionId": zod.string(),
+  "transactionId": zod.string().nullable(),
   "reference": zod.string().nullish(),
   "statut": zod.string(),
+  "simulation": zod.boolean().optional(),
   "montant": zod.number().nullish(),
   "montantNet": zod.number().nullish(),
   "operateur": zod.string().nullish(),
@@ -70,9 +71,10 @@ export const ConfirmerOtpBody = zod.object({
 })
 
 export const ConfirmerOtpResponse = zod.object({
-  "transactionId": zod.string(),
+  "transactionId": zod.string().nullable(),
   "reference": zod.string().nullish(),
   "statut": zod.string(),
+  "simulation": zod.boolean().optional(),
   "montant": zod.number().nullish(),
   "montantNet": zod.number().nullish(),
   "operateur": zod.string().nullish(),
